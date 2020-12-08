@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>jersey-sample</name>
-	<comment>Project jersey-sample created by Buildship.</comment>
+	<name>jersey-guice-sample</name>
+	<comment></comment>
 	<projects>
 	</projects>
 	<buildSpec>
