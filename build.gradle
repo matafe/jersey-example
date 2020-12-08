@@ -1,0 +1,61 @@
+plugins {
+    id 'java-library'
+	id 'war'
+}
+
+compileJava {
+	sourceCompatibility = '1.8'
+	targetCompatibility = '1.8'
+}
+
+repositories {
+    jcenter()
+}
+
+configurations.all {
+	exclude group:"javax.inject", module:"javax.inject"
+ }
+
+dependencies {
+	ext.jakartaWsRsApiVersion='2.1.6'
+	ext.jerseyVersion='2.29.1'//'2.32'
+	ext.guiceVersion='4.1.0'//'4.2.3'
+	ext.guiceBridge='2.6.1'//'2.6.1'
+	
+	ext.slf4jVersion='1.7.30'
+	ext.logbackVersion='1.2.3'
+	ext.janinoVersion='3.1.2'
+	ext.jupiterVersion='5.7.0'
+
+	providedCompile "javax.servlet:javax.servlet-api:3.1.0"
+	
+	// JAX-RS	
+	//implementation "jakarta.ws.rs:jakarta.ws.rs-api:$jakartaWsRsApiVersion"
+	
+	// JAX-RS Impl - Jersery
+	implementation "org.glassfish.jersey.containers:jersey-container-servlet:$jerseyVersion"
+	runtimeOnly "org.glassfish.jersey.core:jersey-server:${jerseyVersion}"
+	runtimeOnly "org.glassfish.jersey.media:jersey-media-json-jackson:${jerseyVersion}"
+	runtimeOnly "org.glassfish.jersey.inject:jersey-hk2:${jerseyVersion}"
+	implementation ("org.glassfish.hk2:guice-bridge:$guiceBridge"){
+		exclude group: 'com.google.inject', module: 'guice'
+	}
+	
+	// DI
+	implementation ("com.google.inject:guice:$guiceVersion") {
+		//exclude group: 'javax.inject', module: 'javax.inject'	// not working.
+	}
+	implementation "com.google.inject.extensions:guice-multibindings:$guiceVersion"
+		
+	
+	// Logging
+	implementation "org.slf4j:slf4j-api:$slf4jVersion"
+	runtimeOnly "ch.qos.logback:logback-core:$logbackVersion"
+	runtimeOnly "ch.qos.logback:logback-classic:$logbackVersion"
+	runtimeOnly "org.codehaus.janino:janino:$janinoVersion"
+	
+	// Test	
+	testImplementation "org.junit.jupiter:junit-jupiter-api:$jupiterVersion"
+	testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$jupiterVersion"
+	
+}
