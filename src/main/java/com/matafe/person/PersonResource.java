@@ -2,7 +2,9 @@ package com.matafe.person;
 
 import java.util.Collection;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -21,6 +23,7 @@ import com.matafe.ErrorResponse;
  * @author ferrazm
  */
 @Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
 @Path("/person")
 public class PersonResource {
 
@@ -55,4 +58,19 @@ public class PersonResource {
 
 		return Response.ok(person).build();
 	}
+
+	@POST
+	@Path("create")
+	public Response create(final Person person) {
+		personService.addPerson(person);
+		return Response.ok(person).build();
+	}
+
+	@POST
+	@Path("update")
+	public Response update(final Person person) {
+		personService.updatePerson(person);
+		return Response.ok(person).build();
+	}
+
 }

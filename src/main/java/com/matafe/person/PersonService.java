@@ -38,10 +38,20 @@ public class PersonService {
 		return personsMap.get(id);
 	}
 
-	public void addPerson(Person p) {
-		personsMap.put(idGenerator.incrementAndGet(), p);
+	public Person addPerson(Person p) {
+		long id = idGenerator.incrementAndGet();
+		p.setId(id);
+		return personsMap.put(id, p);
 	}
 
+	public Person updatePerson(Person p) {
+		Person person = personsMap.get(p.getId());
+		person.setName(p.getName());
+		person.setSex(p.getSex());
+		person.setActive(p.isActive());
+		return personsMap.put(p.getId(), person);
+	}
+	
 	public void removePerson(Person p) {
 		personsMap.remove(p.getId());
 	}
