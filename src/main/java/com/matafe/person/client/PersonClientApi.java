@@ -1,5 +1,6 @@
 package com.matafe.person.client;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Random;
 
@@ -8,115 +9,77 @@ import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.GenericType;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import com.matafe.person.Person;
 
 public class PersonClientApi {
 
+	private final WebTarget webTarget;
+
+	public PersonClientApi(final String url) {
+		Client client = ClientBuilder.newClient();
+		this.webTarget = client.target(url);
+	}
+
 	public static void main(String[] args) {
 
-		PersonClientApi api = new PersonClientApi();
+		String url = "http://localhost:8080/jersey-guice-sample/api";
+		PersonClientApi api = new PersonClientApi(url);
 
-		api.listPersons();
-
-		System.out.println("==================");
-
-		api.listPerson(1L);
-
-		System.out.println("==================");
-
-		api.createPerson();
-
-		System.out.println("==================");
-
-		api.updatePerson();
-	}
-
-	private List<Person> listPersons() {
-
-		Client client = ClientBuilder.newClient();
-
-		String link = "http://localhost:8080/jersey-guice-sample/api";
-		String path = "person";
-
-		WebTarget webTarget = client.target(link).path(path);
-
-		Response response = webTarget.request().get();
-
-		// String json = response.readEntity(String.class);
-		// System.out.println(json);
-
-		// or
-
-		List<Person> persons = response.readEntity(new GenericType<List<Person>>() {
-		});
+		List<Person> persons = api.listPersons();
 		persons.forEach(System.out::println);
 
-		client.close();
+		System.out.println("==================");
 
-		return persons;
+		Person person = api.listPerson(1L);
+		System.out.println(person);
+
+		System.out.println("==================");
+
+		Person pc = new Person.Builder().withName("Person" + new Random().nextLong()).withSex("F").build();
+		Person createdPerson = api.createPerson(pc);
+		System.out.println(createdPerson);
+
+		System.out.println("==================");
+
+		Person pu = new Person.Builder().withId(1L).withName("John Snow " + LocalDateTime.now()).withSex("M")
+				.withActive(true).build();
+		Person updatePerson = api.updatePerson(pu);
+		System.out.println(updatePerson);
 	}
 
-	private Person listPerson(long personId) {
+	List<Person> listPersons() {
 
-		Client client = ClientBuilder.newClient();
-
-		String link = "http://localhost:8080/jersey-guice-sample/api";
-		String path = "person/{id}";
-
-		WebTarget webTarget = client.target(link).path(path).resolveTemplate("id", personId);
-
-		Response response = webTarget.request().get();
+		Response response = this.webTarget.path("person").request().get();
 
 		// String json = response.readEntity(String.class);
 		// System.out.println(json);
 
 		// or
 
-		Person person = response.readEntity(Person.class);
-		System.out.println(person);
-
-		client.close();
-		return person;
+		return response.readEntity(new GenericType<List<Person>>() {
+		});
 	}
 
-	private void createPerson() {
-		Client client = ClientBuilder.newClient();
+	Person listPerson(long personId) {
 
-		String link = "http://localhost:8080/jersey-guice-sample/api";
-		String path = "person/create";
+		Response response = this.webTarget.path("person/{id}").resolveTemplate("id", personId).request().get();
 
-		WebTarget webTarget = client.target(link).path(path);
+		// String json = response.readEntity(String.class);
+		// System.out.println(json);
 
-		long nextLong = new Random().nextLong();
-		Person p = new Person.Builder().withName("Person" + nextLong).withSex("F").build();
-		Response response = webTarget.request().accept(MediaType.APPLICATION_JSON).post(Entity.json(p));
-
-		Person person = response.readEntity(Person.class);
-		System.out.println(person);
-
-		client.close();
-
+		// or
+		return response.readEntity(Person.class);
 	}
 
-	private void updatePerson() {
+	Person createPerson(Person person) {
+		Response response = webTarget.path("person/create").request().post(Entity.json(person));
+		return response.readEntity(Person.class);
+	}
 
-		Client client = ClientBuilder.newClient();
-
-		String link = "http://localhost:8080/jersey-guice-sample/api";
-		String path = "person/update";
-
-		WebTarget webTarget = client.target(link).path(path);
-
-		Person p = new Person.Builder().withId(1L).withName("John Snow").withSex("M").withActive(true).build();
-		Response response = webTarget.request().accept(MediaType.APPLICATION_JSON).post(Entity.json(p));
-
-		Person person = response.readEntity(Person.class);
-		System.out.println(person);
-
-		client.close();
-
+	Person updatePerson(Person person) {
+		Response response = this.webTarget.path("person/update").request().post(Entity.json(person));
+		return response.readEntity(Person.class);
 	}
 }
